@@ -1,7 +1,7 @@
 /* 任务颜色标注规则 */
-.task-urgent { background-color: #ff6b6b !important; color: #fff; }    /* 24小时内到期 */
-.task-warning { background-color: #feca57 !important; }   /* 3天内到期 */
-.task-normal { background-color: #1dd1a1 !important; color: #fff; }    /* 其他情况 */
+.task-urgent { background-color: var(--color-danger) !important; color: #fff; }    /* 24小时内到期 */
+.task-warning { background-color: var(--color-warning) !important; color: #222; }   /* 3天内到期 */
+.task-normal { background-color: var(--color-primary) !important; color: #fff; }    /* 其他情况 */
 
 /* 动态应用颜色类 */
 .task-card {
@@ -39,6 +39,8 @@
   flex: 1;
   padding: 32px;
   background: var(--color-bg, #f5f5f5);
+  background: var(--color-bg);
+  color: var(--color-text);
 }
 .task-list {
   display: flex;
@@ -81,4 +83,36 @@
   margin: 4px 0 12px 0;
   width: 100%;
   padding: 4px;
+}
+
+body {
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: inherit;
+}
+
+.page-content {
+  background: var(--color-bg);
+  color: var(--color-text);
+}
+
+h1, h2, h3, h4, h5, h6 {
+  color: var(--color-text);
+}
+
+a {
+  color: var(--color-primary);
+}
+
+button {
+  background: var(--color-btn-bg);
+  color: var(--color-btn-text);
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  transition: background 0.2s;
+  cursor: pointer;
+}
+button:hover {
+  background: var(--color-btn-hover);
 }

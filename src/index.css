@@ -1,4 +1,7 @@
 :root {
+  --color-bg: #242424;
+  --color-text: rgba(255, 255, 255, 0.87);
+
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
@@ -28,6 +31,10 @@ body {
   place-items: center;
   min-width: 320px;
   min-height: 100vh;
+
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: inherit;
 }
 
 h1 {
@@ -56,8 +63,8 @@ button:focus-visible {
 
 @media (prefers-color-scheme: light) {
   :root {
-    color: #213547;
-    background-color: #ffffff;
+    --color-bg: #ffffff;
+    --color-text: #213547;
   }
   a:hover {
     color: #747bff;

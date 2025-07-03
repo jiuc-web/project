@@ -6,7 +6,7 @@ export function ThemeProvider({ children }) {
   const [theme, setTheme] = useState('light');
 
   useEffect(() => {
-    document.body.className = theme;
+    document.documentElement.setAttribute('data-theme', theme);
   }, [theme]);
 
   const toggleTheme = () => setTheme(t => (t === 'light' ? 'dark' : 'light'));
@@ -18,5 +18,4 @@ export function ThemeProvider({ children }) {
   );
 }
 
-// 方便在页面中直接调用
 export const useTheme = () => useContext(ThemeContext);

@@ -1,17 +1,14 @@
 import { createContext, useState, useEffect } from 'react';
-import { Outlet, Link, useNavigate } from 'react-router-dom';
-import '../assets/css/App.css';
 
 export const SettingsContext = createContext();
 
 export function SettingsProvider({ children }) {
   const [settings, setSettings] = useState({
-    fontFamily: 'Arial',
-    theme: 'light'
+    fontFamily: 'Arial'
   });
 
   useEffect(() => {
-    document.body.style.fontFamily = settings.fontFamily;
+    document.body.style.fontFamily = settings.fontFamily + ', sans-serif';
   }, [settings.fontFamily]);
 
   return (

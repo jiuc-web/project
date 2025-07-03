@@ -1,8 +1,10 @@
 import { Outlet, Link, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
+import UserProfileModal from '../settings/UserProfileModal';
 
 export default function AuthLayout() {
-  const [user, setUser] = useState({ username: '测试用户' });
+  const [user, setUser] = useState({ username: '测试用户', nickname: '测试用户', signature: '这个人很懒', });
+  const [showProfile, setShowProfile] = useState(false);
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -21,8 +23,10 @@ export default function AuthLayout() {
         <div className="nav-user">
           {user ? (
             <>
-              欢迎，{user.username}！
+              <button onClick={() => setShowProfile(true)} style={{ marginRight: 8 }}>用户设置</button>
+              欢迎，{user.nickname || user.username}！
               <button onClick={handleLogout} style={{ marginLeft: 8 }}>退出</button>
+              <UserProfileModal open={showProfile} onClose={() => setShowProfile(false)} user={user} setUser={setUser} />
             </>
           ) : (
             <>

@@ -1,7 +1,7 @@
 /* 任务颜色标注规则 */
-.task-urgent { background-color: #ff6b6b; color: #fff; }    /* 24小时内到期 */
-.task-warning { background-color: #feca57; }   /* 3天内到期 */
-.task-normal { background-color: #1dd1a1; }    /* 其他情况 */
+.task-urgent { background-color: #ff6b6b !important; color: #fff; }    /* 24小时内到期 */
+.task-warning { background-color: #feca57 !important; }   /* 3天内到期 */
+.task-normal { background-color: #1dd1a1 !important; color: #fff; }    /* 其他情况 */
 
 /* 动态应用颜色类 */
 .task-card {
@@ -63,4 +63,22 @@
   padding: 4px 12px;
   border-radius: 4px;
   cursor: pointer;
+}
+.modal-backdrop {
+  position: fixed; left: 0; top: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.2);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 1000;
+}
+.modal {
+  background: #fff;
+  padding: 24px 32px;
+  border-radius: 8px;
+  min-width: 320px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+.modal input, .modal select {
+  margin: 4px 0 12px 0;
+  width: 100%;
+  padding: 4px;
 }

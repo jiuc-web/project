@@ -8,6 +8,7 @@ import (
 	"backend/internal/models"
 	"backend/internal/routes"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"gorm.io/driver/sqlserver"
 	"gorm.io/gorm"
@@ -44,6 +45,15 @@ func main() {
 
 	// 初始化Gin
 	router := gin.Default()
+
+	// 注册CORS中间件
+	router.Use(cors.New(cors.Config{
+		AllowOrigins:     []string{"http://localhost:5173"}, // 前端端口
+		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"},
+		ExposeHeaders:    []string{"Content-Length"},
+		AllowCredentials: true,
+	}))
 
 	// 设置路由
 	routes.SetupRoutes(router, db, cfg.JWTSecret)

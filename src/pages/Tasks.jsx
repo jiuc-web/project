@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { fetchTasks, createTask, updateTask, deleteTask } from '../services/taskService';
 
 function getTaskColorClass(dueDate) {
   const now = new Date();
@@ -10,45 +11,47 @@ function getTaskColorClass(dueDate) {
 }
 
 export default function Tasks() {
-  const [tasks, setTasks] = useState([
-    { id: 1, title: '完成前端页面', dueDate: '2025-07-05', description: '实现任务管理系统前端页面', expanded: false },
-    { id: 2, title: '整理后端接口文档', dueDate: '2025-07-10', description: '补全接口文档，便于前后端联调', expanded: false }
-  ]);
+  const [tasks, setTasks] = useState([]);
   const [newTask, setNewTask] = useState('');
   const [newDueDate, setNewDueDate] = useState('');
   const [newDesc, setNewDesc] = useState('');
 
-  const handleAddTask = () => {
+  useEffect(() => {
+    fetchTasks().then(res => {
+      if (res.data.code === 0) setTasks(res.data.data);
+    });
+  }, []);
+
+  const handleAddTask = async () => {
     if (!newTask.trim() || !newDueDate) return;
-    setTasks([
-      ...tasks,
-      { id: Date.now(), title: newTask, dueDate: newDueDate, description: newDesc, expanded: false }
-    ]);
-    setNewTask('');
-    setNewDueDate('');
-    setNewDesc('');
+    const res = await createTask({ title: newTask, dueDate: newDueDate, description: newDesc });
+    if (res.data.code === 0) {
+      setTasks([...tasks, res.data.data]);
+      setNewTask('');
+      setNewDueDate('');
+      setNewDesc('');
+    } else {
+      alert(res.data.msg || '添加失败');
+    }
   };
 
-  const handleDeleteTask = (id) => {
-    setTasks(tasks.filter(task => task.id !== id));
+  const handleDeleteTask = async (id) => {
+    const res = await deleteTask(id);
+    if (res.data.code === 0) {
+      setTasks(tasks.filter(task => task.id !== id));
+    } else {
+      alert(res.data.msg || '删除失败');
+    }
   };
 
-  const handleToggleExpand = (id) => {
-    setTasks(tasks.map(task =>
-      task.id === id ? { ...task, expanded: !task.expanded } : task
-    ));
-  };
-
-  const handleDescChange = (id, value) => {
-    setTasks(tasks.map(task =>
-      task.id === id ? { ...task, description: value } : task
-    ));
-  };
-
-  const handleDueDateChange = (id, value) => {
-    setTasks(tasks.map(task =>
-      task.id === id ? { ...task, dueDate: value } : task
-    ));
+  const handleUpdateDueDate = async (id, value) => {
+    const task = tasks.find(t => t.id === id);
+    const res = await updateTask(id, { ...task, dueDate: value });
+    if (res.data.code === 0) {
+      setTasks(tasks.map(t => t.id === id ? { ...t, dueDate: value } : t));
+    } else {
+      alert(res.data.msg || '修改失败');
+    }
   };
 
   return (
@@ -57,57 +60,22 @@ export default function Tasks() {
       <div className="task-list">
         {tasks.map(task => (
           <div key={task.id} className={`task-card ${getTaskColorClass(task.dueDate)}`}>
-            <div style={{ display: 'flex', alignItems: 'center' }}>
-              <span
-                style={{
-                  display: 'inline-block',
-                  width: 12,
-                  height: 12,
-                  borderRadius: '50%',
-                  marginRight: 8,
-                  background: getTaskColorClass(task.dueDate) === 'task-urgent'
-                    ? '#ff6b6b'
-                    : getTaskColorClass(task.dueDate) === 'task-warning'
-                    ? '#feca57'
-                    : '#1dd1a1'
-                }}
-                title={
-                  getTaskColorClass(task.dueDate) === 'task-urgent'
-                    ? '紧急'
-                    : getTaskColorClass(task.dueDate) === 'task-warning'
-                    ? '即将到期'
-                    : '充裕'
-                }
-              ></span>
+            <div>
               <strong>{task.title}</strong>
-              <button
-                style={{ marginLeft: 'auto', marginRight: 8 }}
-                onClick={() => handleToggleExpand(task.id)}
-              >
-                {task.expanded ? '收起' : '展开'}
-              </button>
-              <button className="delete-btn" onClick={() => handleDeleteTask(task.id)}>删除</button>
+              <button className="delete-btn" onClick={() => handleDeleteTask(task.id)} style={{ float: 'right' }}>删除</button>
             </div>
-            <div style={{ marginTop: 8 }}>
+            <div>
               截止：
               <input
                 type="date"
                 value={task.dueDate}
-                onChange={e => handleDueDateChange(task.id, e.target.value)}
+                onChange={e => handleUpdateDueDate(task.id, e.target.value)}
                 style={{ marginLeft: 4 }}
               />
             </div>
-            {task.expanded && (
-              <div style={{ marginTop: 8 }}>
-                <textarea
-                  value={task.description}
-                  onChange={e => handleDescChange(task.id, e.target.value)}
-                  rows={3}
-                  style={{ width: '100%' }}
-                  placeholder="任务详细描述"
-                />
-              </div>
-            )}
+            <div>
+              {task.description}
+            </div>
           </div>
         ))}
       </div>

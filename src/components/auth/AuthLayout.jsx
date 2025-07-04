@@ -8,6 +8,7 @@ export default function AuthLayout() {
   const navigate = useNavigate();
 
   const handleLogout = () => {
+    localStorage.removeItem('token');
     setUser(null);
     navigate('/login');
   };

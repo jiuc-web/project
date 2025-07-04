@@ -1,18 +1,24 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { login } from '../services/authService';
 
 export default function Login() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
-    if (username && password) {
-      alert('登录成功！');
-      navigate('/');
-    } else {
-      alert('请输入用户名和密码');
+    try {
+      const res = await login(username, password);
+      if (res.data.code === 0) {
+        localStorage.setItem('token', res.data.data.token);
+        navigate('/');
+      } else {
+        alert(res.data.msg || '登录失败');
+      }
+    } catch (e) {
+      alert('登录请求失败');
     }
   };
 

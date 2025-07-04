@@ -1,11 +1,13 @@
-import api from './api';
+import request from '../utils/request';
 
-export const fetchTasks = () => api.get('/tasks');
-export const createTask = (task) => api.post('/tasks', task);
-export const updateTask = (id, task) => api.put(`/tasks/${id}`, task);
-export const deleteTask = (id) => api.delete(`/tasks/${id}`);
-export const uploadResource = (taskId, file) => {
-  const formData = new FormData();
-  formData.append('file', file);
-  return api.post(`/tasks/${taskId}/resources`, formData);
-};
+// 获取任务列表
+export const fetchTasks = () => request.get('/tasks');
+
+// 新建任务
+export const createTask = (task) => request.post('/tasks', task);
+
+// 更新任务
+export const updateTask = (id, task) => request.put(`/tasks/${id}`, task);
+
+// 删除任务
+export const deleteTask = (id) => request.delete(`/tasks/${id}`);

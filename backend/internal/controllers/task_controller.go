@@ -18,6 +18,12 @@ func NewTaskController(db *gorm.DB) *TaskController {
 	return &TaskController{DB: db}
 }
 
+type CreateTaskRequest struct {
+	Title       string    `json:"title" binding:"required"`
+	Description string    `json:"description"`
+	DueDate     time.Time `json:"dueDate"` // 新增
+}
+
 // CreateTask 创建新任务
 func (tc *TaskController) CreateTask(c *gin.Context) {
 	userID, exists := c.Get("userID")
@@ -26,27 +32,21 @@ func (tc *TaskController) CreateTask(c *gin.Context) {
 		return
 	}
 
-	var taskInput struct {
-		Title       string    `json:"title" binding:"required"`
-		Description string    `json:"description"`
-		DueDate     time.Time `json:"dueDate"`
-		Priority    int       `json:"priority"`
-	}
-
-	if err := c.ShouldBindJSON(&taskInput); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	var req CreateTaskRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"msg": "参数错误"})
 		return
 	}
 
 	// 根据截止日期设置颜色
-	colorCode := getColorCodeByDueDate(taskInput.DueDate)
+	colorCode := getColorCodeByDueDate(req.DueDate) // 修改这里
 
 	task := models.Task{
 		UserID:      userID.(uint),
-		Title:       taskInput.Title,
-		Description: taskInput.Description,
-		DueDate:     taskInput.DueDate,
-		Priority:    taskInput.Priority,
+		Title:       req.Title,
+		Description: req.Description,
+		DueDate:     req.DueDate, // 使用前端传递的截止日期
+		Priority:    0,
 		ColorCode:   colorCode,
 		Status:      "pending",
 	}

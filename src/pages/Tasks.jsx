@@ -22,16 +22,20 @@ export default function Tasks() {
     });
   }, []);
 
+  // 提交前转换
   const handleAddTask = async () => {
     if (!newTask.trim() || !newDueDate) return;
-    const res = await createTask({ title: newTask, dueDate: newDueDate, description: newDesc });
-    if (res.data.code === 0) {
-      setTasks([...tasks, res.data.data]);
+    const dueDateISO = new Date(newDueDate).toISOString();
+    // 这里传递三个参数
+    const res = await createTask(newTask, newDesc, dueDateISO);
+    // 判断 HTTP 状态码
+    if (res.status === 201 && res.data && res.data.id) {
+      setTasks([...tasks, res.data]);
       setNewTask('');
       setNewDueDate('');
       setNewDesc('');
     } else {
-      alert(res.data.msg || '添加失败');
+      alert((res.data && res.data.msg) || '添加失败');
     }
   };
 
@@ -67,7 +71,7 @@ export default function Tasks() {
             <div>
               截止：
               <input
-                type="date"
+                type="datetime-local"
                 value={task.dueDate}
                 onChange={e => handleUpdateDueDate(task.id, e.target.value)}
                 style={{ marginLeft: 4 }}
@@ -86,7 +90,7 @@ export default function Tasks() {
           placeholder="新任务名称"
         />
         <input
-          type="date"
+          type="datetime-local"
           value={newDueDate}
           onChange={e => setNewDueDate(e.target.value)}
           style={{ marginLeft: 8 }}

@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { login } from '../services/authService';
 
 export default function Login() {
-  const [identifier, setIdentifier] = useState(''); // 用户名或邮箱
+  const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
 
@@ -11,7 +11,7 @@ export default function Login() {
     e.preventDefault();
     try {
       const res = await login(identifier, password);
-      if (res.data.code === 0 || res.data.token) {
+      if (res.data.token) {
         localStorage.setItem('token', res.data.token);
         navigate('/');
       } else {

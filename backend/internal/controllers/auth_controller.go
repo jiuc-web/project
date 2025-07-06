@@ -76,8 +76,7 @@ type LoginRequest struct {
 	Password   string `json:"password" binding:"required"`
 }
 
-// Login 用户登录
-func (ac *AuthController) Login(c *gin.Context) {
+func (a *AuthController) Login(c *gin.Context) {
 	var req LoginRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"msg": "参数错误"})
@@ -86,8 +85,8 @@ func (ac *AuthController) Login(c *gin.Context) {
 
 	var user models.User
 	// 先用邮箱查找，再用用户名查找
-	if err := ac.DB.Where("email = ?", req.Identifier).First(&user).Error; err != nil {
-		if err := ac.DB.Where("username = ?", req.Identifier).First(&user).Error; err != nil {
+	if err := a.DB.Where("email = ?", req.Identifier).First(&user).Error; err != nil {
+		if err := a.DB.Where("username = ?", req.Identifier).First(&user).Error; err != nil {
 			c.JSON(http.StatusUnauthorized, gin.H{"msg": "用户不存在"})
 			return
 		}
@@ -104,7 +103,7 @@ func (ac *AuthController) Login(c *gin.Context) {
 		"exp":    time.Now().Add(time.Hour * 24).Unix(),
 	})
 
-	tokenString, err := token.SignedString([]byte(ac.JWTSecret))
+	tokenString, err := token.SignedString([]byte(a.JWTSecret))
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"msg": "生成token失败"})
 		return

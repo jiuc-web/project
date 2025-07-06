@@ -3,19 +3,19 @@ import { useNavigate } from 'react-router-dom';
 import { login } from '../services/authService';
 
 export default function Login() {
-  const [username, setUsername] = useState('');
+  const [identifier, setIdentifier] = useState(''); // 用户名或邮箱
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const res = await login(username, password);
-      if (res.data.code === 0) {
-        localStorage.setItem('token', res.data.data.token);
+      const res = await login(identifier, password);
+      if (res.data.code === 0 || res.data.token) {
+        localStorage.setItem('token', res.data.token);
         navigate('/');
       } else {
-        alert(res.data.msg || '登录失败');
+        alert(res.data.msg || res.data.error || '登录失败');
       }
     } catch (e) {
       alert('登录请求失败');
@@ -26,21 +26,17 @@ export default function Login() {
     <div>
       <h1>登录</h1>
       <form onSubmit={handleLogin}>
-        <div>
-          <input
-            placeholder="用户名"
-            value={username}
-            onChange={e => setUsername(e.target.value)}
-          />
-        </div>
-        <div>
-          <input
-            type="password"
-            placeholder="密码"
-            value={password}
-            onChange={e => setPassword(e.target.value)}
-          />
-        </div>
+        <input
+          placeholder="用户名或邮箱"
+          value={identifier}
+          onChange={e => setIdentifier(e.target.value)}
+        />
+        <input
+          type="password"
+          placeholder="密码"
+          value={password}
+          onChange={e => setPassword(e.target.value)}
+        />
         <button type="submit">登录</button>
       </form>
       <button onClick={() => navigate('/register')} style={{ marginTop: 8 }}>没有账号？去注册</button>

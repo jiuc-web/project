@@ -71,28 +71,30 @@ func (ac *AuthController) Register(c *gin.Context) {
 	c.JSON(http.StatusCreated, gin.H{"message": "User registered successfully"})
 }
 
+type LoginRequest struct {
+	Identifier string `json:"identifier" binding:"required"` // 用户名或邮箱
+	Password   string `json:"password" binding:"required"`
+}
+
 // Login 用户登录
 func (ac *AuthController) Login(c *gin.Context) {
-	var loginInput struct {
-		Username string `json:"username" binding:"required"`
-		Password string `json:"password" binding:"required"`
-	}
-
-	if err := c.ShouldBindJSON(&loginInput); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	var req LoginRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"msg": "参数错误"})
 		return
 	}
 
-	// 查找用户
 	var user models.User
-	if err := ac.DB.Where("username = ?", loginInput.Username).First(&user).Error; err != nil {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid credentials"})
-		return
+	// 先用邮箱查找，再用用户名查找
+	if err := ac.DB.Where("email = ?", req.Identifier).First(&user).Error; err != nil {
+		if err := ac.DB.Where("username = ?", req.Identifier).First(&user).Error; err != nil {
+			c.JSON(http.StatusUnauthorized, gin.H{"msg": "用户不存在"})
+			return
+		}
 	}
 
-	// 验证密码
-	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(loginInput.Password)); err != nil {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid credentials"})
+	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(req.Password)); err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"msg": "密码错误"})
 		return
 	}
 
@@ -104,7 +106,7 @@ func (ac *AuthController) Login(c *gin.Context) {
 
 	tokenString, err := token.SignedString([]byte(ac.JWTSecret))
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to generate token"})
+		c.JSON(http.StatusInternalServerError, gin.H{"msg": "生成token失败"})
 		return
 	}
 
